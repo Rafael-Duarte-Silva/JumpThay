@@ -3,7 +3,7 @@ let player = {
     hp: 10,
 }
 
-let velocidade = 10;
+let velocidade = 17;
 
 let x = 0;
 let y = 0;
@@ -25,7 +25,7 @@ function criar_elementos(){
             $("#player").css("left", x+"px");
         }
 
-        if(event.key == "d" && x < document.body.clientWidth / 2 - player.colisao){
+        if(event.key == "d" && x < document.body.clientWidth / 2 - player.colisao - velocidade){
             x += velocidade;
             $("#player").css("left", x+"px");
         }
