@@ -3,6 +3,7 @@ $(document).ready(() => {
 
     btnComecar.click(() => {
         btnComecar.remove();
-        criar_elementos();
+        createJogo();
+        framesJogo();
     });
 });
