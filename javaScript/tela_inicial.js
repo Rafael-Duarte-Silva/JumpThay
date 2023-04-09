@@ -1,9 +1,7 @@
 $(document).ready(() => {
-    let btnComecar = $("#btn_comecar");
-
-    btnComecar.click(() => {
-        btnComecar.remove();
-        createJogo();
+    $("#btn_comecar").click(() => {
+        $("#btn_comecar").remove();
+        CriarJogo();
         framesJogo();
     });
 });
