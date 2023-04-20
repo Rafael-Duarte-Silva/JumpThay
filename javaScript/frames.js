@@ -1,3 +1,11 @@
+//Todo metodo de entra no DOM também tem uma saida (normalmente mais de uma).
+//Não confudir metodos do jquey com os metodos DOM.
+//Conta em concatenação não dá certo.
+//Todos os metodos em js respeita as regras de matematica.
+//Certos nomes de variaveis e funções que varia em cada linguagem pode dar conflito com os nomes atribuidos a mesma.
+//Sempre criar nomes respeitando a regra de sla quem. Ex: carroFord.
+
+
 /*
 Dependendo da aplicação aquivos que estão em caminhos diferentes precisam do / antes 
 de chamar a sua localização. 
@@ -22,6 +30,9 @@ for(let i = 0; i > 1; i++){
 *Tentar relacionar o evento de teclas com os frames.
 *Implementar responsividade em tempo real.
 *Posso colocar um cooldown no "pulo".
+*Trocar objeto "obstaculo" para classe.
+
+*Utilização de scss
 */
 
 
@@ -146,7 +157,7 @@ function obstaculoCriar(){
     obstaculo.x = document.body.offsetWidth + 20;
 
     let sorteio = Math.floor(Math.random() * document.querySelector("#obstaculo-"+obstaculo.num).offsetHeight) + document.body.offsetHeight - document.querySelector("#obstaculo-"+obstaculo.num).offsetHeight;
-    let ySortear = Math.floor(sorteio / 50) * 50;
+    let ySortear = Math.ceil(sorteio / 50) * 50;
 
     obstaculo.html.style.top = ySortear+"px";
     obstaculo.html.style.left = obstaculo.x+"px";
