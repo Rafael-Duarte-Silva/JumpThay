@@ -53,14 +53,14 @@ for(let i = 0; i > 1; i++){
 // ==============================
 
 let player = {
-    Colisao: 0,
+    colisao: 0,
     y: 0,
 
     press: false,
 
     tempo: 0,
 
-    criar (){
+    criar(){
         let html = $("<img></img>")
 
         html.attr("src", "arquivos/sprite/player/spr_player.png");
@@ -70,19 +70,20 @@ let player = {
         html.css("height", "160px");
         $("body").append(html);
 
-        player.Colisao = document.getElementById("player").offsetHeight / 2;
+        player.colisao = document.getElementById("player").offsetHeight / 2;
     },
 
-    subir (){
-        if(frames > player.tempo && player.y < document.body.offsetHeight / 2 - player.Colisao - 4){  
+    loop(){
+        if(player.y >= document.body.offsetHeight / 2 - player.colisao - 4){
+            $("body").empty();
+        }
+        else if(framesCont > player.tempo){
             player.y += 4;
             $("#player").css("top", player.y+"px");
         }
-        else if(frames < player.tempo){
-            if(player.y > -document.body.offsetHeight / 2 + player.Colisao){   
-                player.y -= 6;
-                $("#player").css("top", player.y+"px"); 
-            }
+        else if(player.y > -document.body.offsetHeight / 2 + player.colisao){
+            player.y -= 6;
+            $("#player").css("top", player.y+"px"); 
         }
         else{
             player.tempo = 0;
@@ -100,20 +101,20 @@ let obstaculo = {
     x: 0,
     y: 0,
 
-    num: 0,
+    id: 0,
     cont: 0,
     atual: 0,
     intervalo: 0,
 
-    criar (){
-        obstaculo.intervalo = frames + 205;
+    criar(){
+        obstaculo.intervalo = framesCont + 205;
     
         obstaculo.html = document.createElement("img");
     
-        obstaculo.num++;
+        obstaculo.id++;
     
         obstaculo.html.setAttribute("src", "arquivos/sprite/obstaculo/spr_obstaculo.png");
-        obstaculo.html.setAttribute("id", "obstaculo-"+obstaculo.num);
+        obstaculo.html.setAttribute("id", "obstaculo-"+obstaculo.id);
         obstaculo.html.style.position = "fixed";
         obstaculo.html.style.width = "162px";
         obstaculo.html.style.height = "500px";
@@ -121,7 +122,7 @@ let obstaculo = {
     
         obstaculo.x = document.body.offsetWidth + 20;
     
-        let sorteio = Math.floor(Math.random() * document.querySelector("#obstaculo-"+obstaculo.num).offsetHeight) + document.body.offsetHeight - document.querySelector("#obstaculo-"+obstaculo.num).offsetHeight;
+        let sorteio = Math.floor(Math.random() * document.querySelector("#obstaculo-"+obstaculo.id).offsetHeight) + document.body.offsetHeight - document.querySelector("#obstaculo-"+obstaculo.id).offsetHeight;
         let ySortear = Math.ceil(sorteio / 50) * 50;
     
         obstaculo.html.style.top = ySortear+"px";
@@ -129,30 +130,30 @@ let obstaculo = {
     
         obstaculo.html = document.createElement("img");
     
-        obstaculo.num++;
+        obstaculo.id++;
     
         obstaculo.html.setAttribute("src", "arquivos/sprite/obstaculo/spr_obstaculo.png");
-        obstaculo.html.setAttribute("id", "obstaculo-"+obstaculo.num);
+        obstaculo.html.setAttribute("id", "obstaculo-"+obstaculo.id);
         obstaculo.html.style.position = "fixed";
         obstaculo.html.style.width = "162px";
         obstaculo.html.style.height = "500px";
         $("body").append(obstaculo.html);
     
-        obstaculo.num--;
+        obstaculo.id--;
         
-        obstaculo.y = document.querySelector("#obstaculo-"+obstaculo.num).offsetTop - document.querySelector("#obstaculo-"+obstaculo.num).offsetHeight - document.getElementById("player").offsetHeight - 90;
+        obstaculo.y = document.querySelector("#obstaculo-"+obstaculo.id).offsetTop - document.querySelector("#obstaculo-"+obstaculo.id).offsetHeight - document.getElementById("player").offsetHeight - 90;
         obstaculo.html.style.top = obstaculo.y+"px";
         obstaculo.html.style.left = obstaculo.x+"px";
     
-        obstaculo.num++;
+        obstaculo.id++;
     },
 
-    mover (){
-        atualObstaculo = obstaculo.num - obstaculo.cont + 1;
+    loop(){
+        obstaculo.atual = obstaculo.id - obstaculo.cont + 1;
 
-        if(document.querySelector("#obstaculo-"+atualObstaculo).offsetLeft > 0 - document.querySelector("#obstaculo-"+atualObstaculo).offsetWidth){
+        if(document.querySelector("#obstaculo-"+obstaculo.atual).offsetLeft > 0 - document.querySelector("#obstaculo-"+obstaculo.atual).offsetWidth){
             
-            for(let i = obstaculo.num - obstaculo.cont + 1; i < obstaculo.num + 1; i++){
+            for(let i = obstaculo.id - obstaculo.cont + 1; i < obstaculo.id + 1; i++){
                 let x = document.querySelector("#obstaculo-"+i).offsetLeft;
 
                 x -= 3;
@@ -162,14 +163,14 @@ let obstaculo = {
         }
         else{
 
-            for(let i = obstaculo.num - obstaculo.cont + 1; i < obstaculo.num - obstaculo.cont + 3; i++){
+            for(let i = obstaculo.id - obstaculo.cont + 1; i < obstaculo.id - obstaculo.cont + 3; i++){
                 $("#obstaculo-"+i).remove();
             }
             obstaculo.cont -= 2;
 
         }
 
-        if(frames == obstaculo.intervalo){
+        if(framesCont >= obstaculo.intervalo){
             obstaculo.criar();
             obstaculo.cont += 2;
         }
@@ -177,23 +178,27 @@ let obstaculo = {
 }
 
 // ==============================
-// CRIAR INSTANCIAS
+// JOGO
 // ==============================
 
-function CriarJogo(){
+function jogo(){
     player.criar();
+    obstaculo.criar();
+    obstaculo.cont += 2;
+
+    frames();
 }
 
 // ==============================
-// LOOP FRAMES
+// LOOP
 // ==============================
 
-let frames = 0;
+let framesCont = 0;
 
-function framesJogo(){
+function frames(){
     $("body").keydown((event) => { 
         if(event.key == "w" && player.press == false){
-            player.tempo = frames + 25;
+            player.tempo = framesCont + 25;
             player.press = true;
 
             $("body").keyup(() => {
@@ -202,18 +207,15 @@ function framesJogo(){
         }
     });
 
-    obstaculo.criar();
-    obstaculo.cont += 2;
-
     let loop = setInterval(() => {
-        frames += 1;
+        framesCont += 1;
 
-        player.subir();
-        obstaculo.mover();
+        player.loop();
+        obstaculo.loop();
 
         /* 
-        if(frames > 100 && player.tempo == 0){
-            frames = 0;
+        if(framesCont > 100 && player.tempo == 0){
+            framesCont = 0;
         }
         */     
     }, 10);

@@ -16,7 +16,23 @@ body{
     height: 100vh;
 }
 
+#btn_secao{
+    display: flex;
+    flex-direction: column;
+}
+
 button{
     width: 40vh;
     height: 10vh;
+
+    margin-bottom: 1.5vh;
+    margin-top: 1.5vh;
+
+    border: 0.6vh black solid;
+    
+    font-size: 5vh;
+}
+
+button:hover{
+    background-color: rgb(255, 255, 255);
 }
