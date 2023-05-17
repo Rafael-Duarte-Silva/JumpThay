@@ -82,15 +82,15 @@ let player = {
     loop(){
         perdeu();
         movimentacao();
+        return perdeu();
         
         function perdeu(){
-            //colisao chão
             player.colisaoBaixo = document.getElementById("player").offsetTop + document.getElementById("player").offsetHeight;
             player.colisaoCima = document.getElementById("player").offsetTop;
 
+            //colisao chão
             if(player.colisaoBaixo >= document.body.offsetHeight){
                 //$("body").empty();
-
                 return true;
             }
 
@@ -102,14 +102,16 @@ let player = {
     
                     if(player.colisaoBaixo >= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetTop){
                         console.log("colisão total baixo");
-                        $("body").empty();
+                        //$("body").empty();
+                        return true;
                     }
 
                     player.obstaculoProximo += 1;
 
                     if(player.colisaoCima <= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetTop + document.getElementById("obstaculo-"+player.obstaculoProximo).offsetHeight){
                         console.log("colisão total cima");
-                        $("body").empty();
+                        //$("body").empty();
+                        return true;
                     }
 
                     player.obstaculoProximo -= 1;
@@ -269,6 +271,10 @@ function frames(){
 
         player.loop();
         obstaculo.loop();
+
+        if(player.loop()){
+            clearInterval(loop);
+        }
 
         /* 
         if(framesCont > 100 && player.tempo == 0){
