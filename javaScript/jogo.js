@@ -53,7 +53,9 @@ for(let i = 0; i > 1; i++){
 // ==============================
 
 let player = {
-    colisaoY: 0,
+    colisaoBaixo: 0,
+    colisaoCima: 0,
+    colisaoDireita: 0,
 
     y: 0,
     x: 0,
@@ -61,6 +63,8 @@ let player = {
     press: false,
 
     tempo: 0,
+
+    obstaculoProximo: 1,
 
     criar(){
         let html = $("<img></img>")
@@ -72,7 +76,7 @@ let player = {
         html.css("height", "160px");
         $("body").append(html);
 
-        player.colisaoY = document.getElementById("player").offsetHeight / 2;
+        player.colisaoDireita = document.getElementById("player").offsetLeft + document.getElementById("player").offsetWidth;
     },
 
     loop(){
@@ -81,50 +85,55 @@ let player = {
         
         function perdeu(){
             //colisao chão
-            if(player.y >= document.body.offsetHeight / 2 - player.colisaoY - 4){
+            player.colisaoBaixo = document.getElementById("player").offsetTop + document.getElementById("player").offsetHeight;
+            player.colisaoCima = document.getElementById("player").offsetTop;
+
+            if(player.colisaoBaixo >= document.body.offsetHeight){
                 //$("body").empty();
 
                 return true;
             }
 
             //colisao obstaculo
-            for(let i = document.getElementById("obstaculo-"+obstaculo.id).offsetLeft; i < document.getElementById("obstaculo-"+obstaculo.id).offsetLeft + document.getElementById("obstaculo-"+obstaculo.id).offsetWidth; i++){
-                for(let j = document.getElementById("player").offsetLeft; j < document.getElementById("player").offsetLeft + document.getElementById("player").offsetWidth; j++){
-                    if(i == j){
-
-                        for(let l = document.getElementById("obstaculo-"+obstaculo.id).offsetTop; l < document.getElementById("obstaculo-"+obstaculo.id).offsetTop + document.getElementById("obstaculo-"+obstaculo.id).offsetHeight; l++){
-                            for(let g = document.getElementById("player").offsetTop; g < document.getElementById("player").offsetTop + document.getElementById("player").offsetHeight; g++){
-                                if(l == g){
-                                    console.log("colisão");
-                                    return true;
-                                }
-                            }
-                        }
-                        
+            if(document.getElementById("obstaculo-"+player.obstaculoProximo).offsetLeft + document.getElementById("obstaculo-"+player.obstaculoProximo).offsetWidth >= document.body.offsetWidth / 2){
+                console.log("entrou");
+                if(player.colisaoDireita >= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetLeft){
+                    console.log("colisão parcial");
+    
+                    if(player.colisaoBaixo >= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetTop){
+                        console.log("colisão total baixo");
+                        $("body").empty();
                     }
+
+                    player.obstaculoProximo += 1;
+
+                    if(player.colisaoCima <= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetTop + document.getElementById("obstaculo-"+player.obstaculoProximo).offsetHeight){
+                        console.log("colisão total cima");
+                        $("body").empty();
+                    }
+
+                    player.obstaculoProximo -= 1;
                 }
-            }
+            }   
         }
 
         function movimentacao(){
-            if(perdeu() != true){
+            player.colisaoCima = document.getElementById("player").offsetTop;
+            //subir
+            if(framesCont > player.tempo){
+                 player.y += 4;
+                $("#player").css("top", player.y+"px");
+            }
 
-                //subir
-                if(framesCont > player.tempo){
-                    player.y += 4;
-                    $("#player").css("top", player.y+"px");
-                }
+            //descer
+            else if(player.colisaoCima > 0){
+                player.y -= 6;
+                $("#player").css("top", player.y+"px"); 
+            }
 
-                //descer
-                else if(player.y > -document.body.offsetHeight / 2 + player.colisaoY){
-                    player.y -= 6;
-                    $("#player").css("top", player.y+"px"); 
-                }
-
-                //resetar cooldown de descer
-                else{
-                    player.tempo = 0;
-                }
+            //resetar cooldown de descer
+            else{
+                player.tempo = 0;
             }
         }
     }
@@ -218,6 +227,8 @@ let obstaculo = {
             if(framesCont >= obstaculo.intervalo){
                 obstaculo.criar();
                 obstaculo.cont += 2;
+
+                player.obstaculoProximo += 2;
             }
         }
     }
