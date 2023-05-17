@@ -54,7 +54,7 @@ for(let i = 0; i > 1; i++){
 
 let player = {
     colisaoY: 0,
-    colisaoX: 0,
+
     y: 0,
     x: 0,
 
@@ -73,7 +73,6 @@ let player = {
         $("body").append(html);
 
         player.colisaoY = document.getElementById("player").offsetHeight / 2;
-        player.colisaoX = document.getElementById("player").offsetWidth / 2;
     },
 
     loop(){
@@ -89,10 +88,21 @@ let player = {
             }
 
             //colisao obstaculo
-            if(document.body.offsetWidth / 2 - document.getElementById("player").offsetWidth / 2 > document.getElementById("obstaculo-"+obstaculo.id).offsetLeft - document.getElementById("obstaculo-"+obstaculo.id).offsetWidth){
-                console.log("colisão");
+            for(let i = document.getElementById("obstaculo-"+obstaculo.id).offsetLeft; i < document.getElementById("obstaculo-"+obstaculo.id).offsetLeft + document.getElementById("obstaculo-"+obstaculo.id).offsetWidth; i++){
+                for(let j = document.getElementById("player").offsetLeft; j < document.getElementById("player").offsetLeft + document.getElementById("player").offsetWidth; j++){
+                    if(i == j){
 
-                return true;
+                        for(let l = document.getElementById("obstaculo-"+obstaculo.id).offsetTop; l < document.getElementById("obstaculo-"+obstaculo.id).offsetTop + document.getElementById("obstaculo-"+obstaculo.id).offsetHeight; l++){
+                            for(let g = document.getElementById("player").offsetTop; g < document.getElementById("player").offsetTop + document.getElementById("player").offsetHeight; g++){
+                                if(l == g){
+                                    console.log("colisão");
+                                    return true;
+                                }
+                            }
+                        }
+                        
+                    }
+                }
             }
         }
 
@@ -170,7 +180,7 @@ let obstaculo = {
     
         obstaculo.id--;
         
-        obstaculo.y = document.querySelector("#obstaculo-"+obstaculo.id).offsetTop - document.querySelector("#obstaculo-"+obstaculo.id).offsetHeight - document.getElementById("player").offsetHeight - 90;
+        obstaculo.y = document.querySelector("#obstaculo-"+obstaculo.id).offsetTop - document.querySelector("#obstaculo-"+obstaculo.id).offsetHeight - document.getElementById("player").offsetHeight - 180;
         obstaculo.html.style.top = obstaculo.y+"px";
         obstaculo.html.style.left = obstaculo.x+"px";
     
