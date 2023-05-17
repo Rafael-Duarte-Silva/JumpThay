@@ -30,7 +30,7 @@ for(let i = 0; i > 1; i++){
 *Tentar relacionar o evento de teclas com os frames.
 *Implementar responsividade em tempo real.
 *Posso colocar um cooldown no "pulo".
-*Trocar objeto "obstaculo" para classe.
+*Ao pular os pixels do player ficam "errados" provocando o erro logico de atravesar a parte de baixo da tela.
 
 * NIVEIS:
 
@@ -269,12 +269,10 @@ function frames(){
     let loop = setInterval(() => {
         framesCont += 1;
 
-        player.loop();
-        obstaculo.loop();
-
         if(player.loop()){
             clearInterval(loop);
         }
+        obstaculo.loop();
 
         /* 
         if(framesCont > 100 && player.tempo == 0){
