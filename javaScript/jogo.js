@@ -53,8 +53,10 @@ for(let i = 0; i > 1; i++){
 // ==============================
 
 let player = {
-    colisao: 0,
+    colisaoY: 0,
+    colisaoX: 0,
     y: 0,
+    x: 0,
 
     press: false,
 
@@ -70,23 +72,50 @@ let player = {
         html.css("height", "160px");
         $("body").append(html);
 
-        player.colisao = document.getElementById("player").offsetHeight / 2;
+        player.colisaoY = document.getElementById("player").offsetHeight / 2;
+        player.colisaoX = document.getElementById("player").offsetWidth / 2;
     },
 
     loop(){
-        if(player.y >= document.body.offsetHeight / 2 - player.colisao - 4){
-            $("body").empty();
+        perdeu();
+        movimentacao();
+        
+        function perdeu(){
+            //colisao chão
+            if(player.y >= document.body.offsetHeight / 2 - player.colisaoY - 4){
+                //$("body").empty();
+
+                return true;
+            }
+
+            //colisao obstaculo
+            if(document.body.offsetWidth / 2 - document.getElementById("player").offsetWidth / 2 > document.getElementById("obstaculo-"+obstaculo.id).offsetLeft - document.getElementById("obstaculo-"+obstaculo.id).offsetWidth){
+                console.log("colisão");
+
+                return true;
+            }
         }
-        else if(framesCont > player.tempo){
-            player.y += 4;
-            $("#player").css("top", player.y+"px");
-        }
-        else if(player.y > -document.body.offsetHeight / 2 + player.colisao){
-            player.y -= 6;
-            $("#player").css("top", player.y+"px"); 
-        }
-        else{
-            player.tempo = 0;
+
+        function movimentacao(){
+            if(perdeu() != true){
+
+                //subir
+                if(framesCont > player.tempo){
+                    player.y += 4;
+                    $("#player").css("top", player.y+"px");
+                }
+
+                //descer
+                else if(player.y > -document.body.offsetHeight / 2 + player.colisaoY){
+                    player.y -= 6;
+                    $("#player").css("top", player.y+"px"); 
+                }
+
+                //resetar cooldown de descer
+                else{
+                    player.tempo = 0;
+                }
+            }
         }
     }
 }
@@ -149,30 +178,37 @@ let obstaculo = {
     },
 
     loop(){
-        obstaculo.atual = obstaculo.id - obstaculo.cont + 1;
+        removerObstaculo();
+        moverEsquerda();
+        sortearObstaculo();
 
-        if(document.querySelector("#obstaculo-"+obstaculo.atual).offsetLeft > 0 - document.querySelector("#obstaculo-"+obstaculo.atual).offsetWidth){
-            
+        function removerObstaculo(){
+            obstaculo.atual = obstaculo.id - obstaculo.cont + 1;
+
+            if(document.querySelector("#obstaculo-"+obstaculo.atual).offsetLeft < 0 - document.querySelector("#obstaculo-"+obstaculo.atual).offsetWidth){
+
+                for(let i = obstaculo.id - obstaculo.cont + 1; i < obstaculo.id - obstaculo.cont + 3; i++){
+                    $("#obstaculo-"+i).remove();
+                }
+                obstaculo.cont -= 2;
+    
+            }
+        }
+
+        function moverEsquerda(){
             for(let i = obstaculo.id - obstaculo.cont + 1; i < obstaculo.id + 1; i++){
                 let x = document.querySelector("#obstaculo-"+i).offsetLeft;
 
                 x -= 3;
                 document.querySelector("#obstaculo-"+i).style.left = x+"px";
             }
-
         }
-        else{
-
-            for(let i = obstaculo.id - obstaculo.cont + 1; i < obstaculo.id - obstaculo.cont + 3; i++){
-                $("#obstaculo-"+i).remove();
+        
+        function sortearObstaculo(){
+            if(framesCont >= obstaculo.intervalo){
+                obstaculo.criar();
+                obstaculo.cont += 2;
             }
-            obstaculo.cont -= 2;
-
-        }
-
-        if(framesCont >= obstaculo.intervalo){
-            obstaculo.criar();
-            obstaculo.cont += 2;
         }
     }
 }
