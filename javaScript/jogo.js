@@ -95,28 +95,35 @@ let player = {
             }
 
             //colisao obstaculo
-            if(document.getElementById("obstaculo-"+player.obstaculoProximo).offsetLeft + document.getElementById("obstaculo-"+player.obstaculoProximo).offsetWidth >= document.body.offsetWidth / 2){
-                console.log("entrou");
-                if(player.colisaoDireita >= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetLeft){
-                    console.log("colisão parcial");
-    
-                    if(player.colisaoBaixo >= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetTop){
-                        console.log("colisão total baixo");
-                        //$("body").empty();
-                        return true;
-                    }
-
-                    player.obstaculoProximo += 1;
-
-                    if(player.colisaoCima <= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetTop + document.getElementById("obstaculo-"+player.obstaculoProximo).offsetHeight){
-                        console.log("colisão total cima");
-                        //$("body").empty();
-                        return true;
-                    }
-
-                    player.obstaculoProximo -= 1;
+            if(document.getElementById("obstaculo-"+player.obstaculoProximo).offsetLeft + document.getElementById("obstaculo-"+player.obstaculoProximo).offsetWidth <= document.body.offsetWidth / 2){
+                if(framesCont >= obstaculo.intervalo){
+                    player.obstaculoProximo += 2;
                 }
-            }   
+
+                pontuacao.ponto += 1;
+
+                document.getElementById("pontuacao").innerText = "Pontuação: " + pontuacao.ponto;
+            }
+
+            if(player.colisaoDireita >= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetLeft){
+                console.log("colisão parcial");
+
+                if(player.colisaoBaixo >= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetTop){
+                    console.log("colisão total baixo");
+                    //$("body").empty();
+                    return true;
+                }
+
+                player.obstaculoProximo += 1;
+
+                if(player.colisaoCima <= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetTop + document.getElementById("obstaculo-"+player.obstaculoProximo).offsetHeight){
+                    console.log("colisão total cima");
+                    //$("body").empty();
+                    return true;
+                }
+
+                player.obstaculoProximo -= 1;
+            }
         }
 
         function movimentacao(){
@@ -138,6 +145,24 @@ let player = {
                 player.tempo = 0;
             }
         }
+    }
+}
+
+// ==============================
+// PONTUAÇÃO E SUAS CONFIGURAÇÕES
+// ==============================
+
+let pontuacao = {
+    ponto: 0,
+
+    criar(){
+        let html = $("<h1>Pontuação:</h1>")
+
+        html.attr("id", "pontuacao");
+        html.css("position", "absolute");
+        html.css("left", "0");
+        html.css("top", "0");
+        $("body").append(html);
     }
 }
 
@@ -191,7 +216,7 @@ let obstaculo = {
     
         obstaculo.id--;
         
-        obstaculo.y = document.querySelector("#obstaculo-"+obstaculo.id).offsetTop - document.querySelector("#obstaculo-"+obstaculo.id).offsetHeight - document.getElementById("player").offsetHeight - 180;
+        obstaculo.y = document.querySelector("#obstaculo-"+obstaculo.id).offsetTop - document.querySelector("#obstaculo-"+obstaculo.id).offsetHeight - document.getElementById("player").offsetHeight - 240;
         obstaculo.html.style.top = obstaculo.y+"px";
         obstaculo.html.style.left = obstaculo.x+"px";
     
@@ -229,8 +254,6 @@ let obstaculo = {
             if(framesCont >= obstaculo.intervalo){
                 obstaculo.criar();
                 obstaculo.cont += 2;
-
-                player.obstaculoProximo += 2;
             }
         }
     }
@@ -242,6 +265,7 @@ let obstaculo = {
 
 function jogo(){
     player.criar();
+    pontuacao.criar();
     obstaculo.criar();
     obstaculo.cont += 2;
 
