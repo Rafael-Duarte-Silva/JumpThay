@@ -56,6 +56,7 @@ let player = {
     colisaoBaixo: 0,
     colisaoCima: 0,
     colisaoDireita: 0,
+    colisaoEsquerda: 0,
 
     y: 0,
     x: 0,
@@ -77,6 +78,7 @@ let player = {
         $("body").append(html);
 
         player.colisaoDireita = document.getElementById("player").offsetLeft + document.getElementById("player").offsetWidth;
+        player.colisaoEsquerda = document.getElementById("player").offsetLeft;
     },
 
     loop(){
@@ -95,14 +97,16 @@ let player = {
             }
 
             //colisao obstaculo
-            if(document.getElementById("obstaculo-"+player.obstaculoProximo).offsetLeft + document.getElementById("obstaculo-"+player.obstaculoProximo).offsetWidth <= document.body.offsetWidth / 2){
-                if(framesCont >= obstaculo.intervalo){
+            if(document.getElementById("obstaculo-"+player.obstaculoProximo).offsetLeft + document.getElementById("obstaculo-"+player.obstaculoProximo).offsetWidth <= player.colisaoEsquerda){
+                if(obstaculo.criado == true){
                     player.obstaculoProximo += 2;
+                    obstaculo.criado = false;
+                    console.log("proximo obstaculo");
                 }
 
-                pontuacao.ponto += 1;
+                //pontuacao.ponto += 1;
 
-                document.getElementById("pontuacao").innerText = "Pontuação: " + pontuacao.ponto;
+                //document.getElementById("pontuacao").innerText = "Pontuação: " + pontuacao.ponto;
             }
 
             if(player.colisaoDireita >= document.getElementById("obstaculo-"+player.obstaculoProximo).offsetLeft){
@@ -181,6 +185,8 @@ let obstaculo = {
     atual: 0,
     intervalo: 0,
 
+    criado: false,
+
     criar(){
         obstaculo.intervalo = framesCont + 205;
     
@@ -254,6 +260,7 @@ let obstaculo = {
             if(framesCont >= obstaculo.intervalo){
                 obstaculo.criar();
                 obstaculo.cont += 2;
+                obstaculo.criado = true;
             }
         }
     }
@@ -287,6 +294,10 @@ function frames(){
             $("body").keyup(() => {
                 player.press = false;
             });
+        }
+
+        if(event.key == "Enter"){
+            clearInterval(loop);
         }
     });
 
