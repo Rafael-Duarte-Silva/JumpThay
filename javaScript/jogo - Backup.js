@@ -49,10 +49,10 @@ for(let i = 0; i > 1; i++){
 */
 
 // ==============================
-// CLASSES
+// PLAYER E SUAS CONFIGURAÇÕES
 // ==============================
 
-class Jogador{
+class player{
     constructor(){
         this.colisao = {
             baixo: 0,
@@ -82,16 +82,13 @@ class Jogador{
 
         html.attr("src", "arquivos/sprite/player/spr_player.png");
         html.attr("id", "player");
-        html.css("position", "absolute");
+        html.css("position", "relative");
         html.css("width", "160px");
         html.css("height", "160px");
         $("body").append(html);
 
         this.colisao.direita = document.getElementById("player").offsetLeft + document.getElementById("player").offsetWidth;
         this.colisao.esquerda = document.getElementById("player").offsetLeft;
-
-        this.posicao.x = document.getElementById("player").offsetLeft;
-        this.posicao.y = document.getElementById("player").offsetTop;
     };
 
     loop(){
@@ -101,7 +98,7 @@ class Jogador{
 
         //colisao chão
         if(this.colisao.baixo >= document.body.offsetHeight){
-            
+            //$("body").empty();
             return true;
         }
 
@@ -123,6 +120,7 @@ class Jogador{
 
             if(this.colisao.baixo >= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop){
                 console.log("colisão total baixo");
+                //$("body").empty();
                 return true;
             }
 
@@ -130,6 +128,7 @@ class Jogador{
 
             if(this.colisao.cima <= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetHeight){
                 console.log("colisão total cima");
+                //$("body").empty();
                 return true;
             }
 
@@ -137,15 +136,15 @@ class Jogador{
         }
 
         //MOVIMENTAÇÃO
-        this.colisao.cima = document.getElementById("player").offsetTop;
         
-        //descer
+        this.colisao.cima = document.getElementById("player").offsetTop;
+        //subir
         if(framesCont > this.tempo){
-            this.posicao.y += 4;
+             this.posicao.y += 4;
             $("#player").css("top", this.posicao.y+"px");
         }
 
-        //subir
+        //descer
         else if(this.colisao.cima > 0){
             this.posicao.y -= 6;
             $("#player").css("top", this.posicao.y+"px"); 
@@ -157,6 +156,13 @@ class Jogador{
         }
     };
 }
+
+let jogador = new player;
+
+// ==============================
+// PONTUAÇÃO E SUAS CONFIGURAÇÕES
+// ==============================
+
 class Pontuacao{
     constructor(){
         this.ponto = 0;
@@ -172,15 +178,15 @@ class Pontuacao{
         $("body").append(html);
     };
 }
+
+let pontuacao = new Pontuacao;
+
+// ==============================
+// OBSTACULO E SUAS CONFIGURAÇÕES
+// ==============================
+
 class Obstaculo{
     constructor(){
-        this.colisao = {
-            baixo: 0,
-            cima: 0,
-            direita: 0,
-            esquerda: 0,
-        }
-
         this.posicao = {
             x: 0,
             y: 0,
@@ -230,7 +236,7 @@ class Obstaculo{
     
         this.informacoes.id--;
         
-        this.posicao.y = document.querySelector("#obstaculo-"+this.informacoes.id).offsetTop - document.querySelector("#obstaculo-"+this.informacoes.id).offsetHeight - document.getElementById("player").offsetHeight - 200;
+        this.posicao.y = document.querySelector("#obstaculo-"+this.informacoes.id).offsetTop - document.querySelector("#obstaculo-"+this.informacoes.id).offsetHeight - document.getElementById("player").offsetHeight - 240;
         html.style.top = this.posicao.y+"px";
         html.style.left = this.posicao.x+"px";
     
@@ -240,10 +246,9 @@ class Obstaculo{
     loop(){
         //REMOVER OBSTACULOS
         this.informacoes.atual = this.informacoes.id - this.informacoes.cont + 1;
-        
         if(document.querySelector("#obstaculo-"+this.informacoes.atual).offsetLeft < 0 - document.querySelector("#obstaculo-"+this.informacoes.atual).offsetWidth){
 
-            for(let i = this.informacoes.atual; i < this.informacoes.id - this.informacoes.cont + 3; i++){
+            for(let i = this.informacoes.id - this.informacoes.cont + 1; i < this.informacoes.id - this.informacoes.cont + 3; i++){
                 $("#obstaculo-"+i).remove();
             }
             this.informacoes.cont -= 2;
@@ -251,9 +256,8 @@ class Obstaculo{
         }
 
         //MOVER PARA ESQUERDA
-        this.informacoes.atual = this.informacoes.id - this.informacoes.cont + 1;
-
-        for(let i = this.informacoes.atual; i < this.informacoes.id + 1; i++){
+        
+        for(let i = this.informacoes.id - this.informacoes.cont + 1; i < this.informacoes.id + 1; i++){
             let x = document.querySelector("#obstaculo-"+i).offsetLeft;
 
             x -= 3;
@@ -269,11 +273,6 @@ class Obstaculo{
     };
 }
 
-// ==============================
-// OBJETOS
-// ==============================
-let jogador = new Jogador;
-let pontuacao = new Pontuacao;
 let obstaculo = new Obstaculo;
 
 // ==============================
