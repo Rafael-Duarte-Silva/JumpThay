@@ -68,6 +68,7 @@ class Jogador{
 
             obstaculo: {
                 proximo: 1,
+                passou: false,
             },
         };
 
@@ -112,35 +113,45 @@ class Jogador{
         }
 
         //colisao obstaculo
-        if(document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetLeft + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetWidth <= this.colisao.esquerda){
-            if(obstaculo.informacoes.criado == true){
+        try{
+            try{
+                if(document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetLeft + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetWidth <= this.colisao.esquerda){
+                    this.colisao.obstaculo.passou = true;
+                }
+            }
+
+            catch(erro){}
+
+            if(obstaculo.informacoes.criado == true && this.colisao.obstaculo.passou == true){
                 this.colisao.obstaculo.proximo += 2;
+
                 obstaculo.informacoes.criado = false;
-                console.log("proximo obstaculo");
+                this.colisao.obstaculo.passou = false;
+                
             }
+    
+            if(pontuacao.pontuado == false && this.colisao.obstaculo.passou == true){
+                pontuacao.ponto += 1;
+                document.getElementById("pontuacao").innerText = "Pontuação: " + pontuacao.ponto;
+                pontuacao.pontuado = true;
+            }
+    
+            if(this.colisao.direita >= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetLeft && this.colisao.obstaculo.passou == false){
+    
+                if(this.colisao.baixo >= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop){
+                    return true;
+                }
+    
+                this.colisao.obstaculo.proximo += 1;
+    
+                if(this.colisao.cima <= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetHeight){
+                    return true;
+                }
 
-            //pontuacao.ponto += 1;
-
-            //document.getElementById("pontuacao").innerText = "Pontuação: " + pontuacao.ponto;
+                this.colisao.obstaculo.proximo -= 1;
+            }
         }
-
-        if(this.colisao.direita >= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetLeft){
-            console.log("colisão parcial");
-
-            if(this.colisao.baixo >= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop){
-                console.log("colisão total baixo");
-                return true;
-            }
-
-            this.colisao.obstaculo.proximo += 1;
-
-            if(this.colisao.cima <= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetHeight){
-                console.log("colisão total cima");
-                return true;
-            }
-
-            this.colisao.obstaculo.proximo -= 1;
-        }
+        catch(erro){}
 
         //MOVIMENTAÇÃO
         this.colisao.cima = document.getElementById("player").offsetTop;
@@ -166,6 +177,7 @@ class Jogador{
 class Pontuacao{
     constructor(){
         this.ponto = 0;
+        this.pontuado = false;
     }
 
     criar(){
@@ -203,7 +215,7 @@ class Obstaculo{
     }
 
     criar(){
-        this.informacoes.intervalo = framesCont + 205;
+        this.informacoes.intervalo = framesCont + 400;
     
         let html = document.createElement("img");
     
@@ -245,33 +257,37 @@ class Obstaculo{
     };
 
     loop(){
-        //REMOVER OBSTACULOS
-        this.informacoes.atual = this.informacoes.id - this.informacoes.cont + 1;
-        
-        if(document.querySelector("#obstaculo-"+this.informacoes.atual).offsetLeft < 0 - document.querySelector("#obstaculo-"+this.informacoes.atual).offsetWidth){
+        try{
+            //REMOVER OBSTACULOS
+            this.informacoes.atual = this.informacoes.id - this.informacoes.cont + 1;
+            
+            if(document.querySelector("#obstaculo-"+this.informacoes.atual).offsetLeft < 0 - document.querySelector("#obstaculo-"+this.informacoes.atual).offsetWidth){
 
-            for(let i = this.informacoes.atual; i < this.informacoes.id - this.informacoes.cont + 3; i++){
-                $("#obstaculo-"+i).remove();
+                for(let i = this.informacoes.atual; i < this.informacoes.id - this.informacoes.cont + 3; i++){
+                    $("#obstaculo-"+i).remove();
+                }
+                this.informacoes.cont -= 2;
+
             }
-            this.informacoes.cont -= 2;
 
+            //MOVER PARA ESQUERDA
+            this.informacoes.atual = this.informacoes.id - this.informacoes.cont + 1;
+
+            for(let i = this.informacoes.atual; i < this.informacoes.id + 1; i++){
+                let x = document.querySelector("#obstaculo-"+i).offsetLeft;
+
+                x -= 3;
+                document.querySelector("#obstaculo-"+i).style.left = x+"px";
+            }
         }
-
-        //MOVER PARA ESQUERDA
-        this.informacoes.atual = this.informacoes.id - this.informacoes.cont + 1;
-
-        for(let i = this.informacoes.atual; i < this.informacoes.id + 1; i++){
-            let x = document.querySelector("#obstaculo-"+i).offsetLeft;
-
-            x -= 3;
-            document.querySelector("#obstaculo-"+i).style.left = x+"px";
-        }
+        catch(erro){}
 
         //SORTEAR OBSTACULOS
         if(framesCont >= this.informacoes.intervalo){
             this.criar();
             this.informacoes.cont += 2;
             this.informacoes.criado = true;
+            pontuacao.pontuado = false;
         }
     };
 }
@@ -279,6 +295,7 @@ class Obstaculo{
 // ==============================
 // OBJETOS
 // ==============================
+
 let jogador = new Jogador;
 let pontuacao = new Pontuacao;
 let obstaculo = new Obstaculo;
