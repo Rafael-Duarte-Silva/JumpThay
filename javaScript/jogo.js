@@ -31,6 +31,12 @@ for(let i = 0; i > 1; i++){
 *Implementar responsividade em tempo real.
 *Posso colocar um cooldown no "pulo".
 *Ao pular os pixels do player ficam "errados" provocando o erro logico de atravesar a parte de baixo da tela.
+*a position relative por algum motivo ao adiconar um valor pela primeira vez ela o soma.
+
+*herança de classes ou passar informações para o constructor.
+*trocar os if do jogador especidicando a colisao da classe objeto.
+*resetar o contador de obstaculos usando o if que determina quando um objeto passado pelo player.
+*resetar o contador de frames usando as horas ou algo do tipo.
 
 * NIVEIS:
 
@@ -187,6 +193,7 @@ class Obstaculo{
         };
     
         this.informacoes = {
+            espacamentos: 200,
             id: 0,
             cont: 0,
             atual: 0,
@@ -230,7 +237,7 @@ class Obstaculo{
     
         this.informacoes.id--;
         
-        this.posicao.y = document.querySelector("#obstaculo-"+this.informacoes.id).offsetTop - document.querySelector("#obstaculo-"+this.informacoes.id).offsetHeight - document.getElementById("player").offsetHeight - 200;
+        this.posicao.y = document.querySelector("#obstaculo-"+this.informacoes.id).offsetTop - document.querySelector("#obstaculo-"+this.informacoes.id).offsetHeight - document.getElementById("player").offsetHeight - this.informacoes.espacamentos;
         html.style.top = this.posicao.y+"px";
         html.style.left = this.posicao.x+"px";
     
