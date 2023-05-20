@@ -89,9 +89,11 @@ class Jogador{
 
         html.attr("src", "arquivos/sprite/player/spr_player.png");
         html.attr("id", "player");
-        html.css("position", "absolute");
+        html.css("position", "fixed");
         html.css("width", "160px");
         html.css("height", "160px");
+
+        html.css("z-index", "0");
         $("body").append(html);
 
         this.colisao.direita = document.getElementById("player").offsetLeft + document.getElementById("player").offsetWidth;
@@ -184,9 +186,11 @@ class Pontuacao{
         let html = $("<h1>Pontuação:</h1>")
 
         html.attr("id", "pontuacao");
-        html.css("position", "absolute");
+        html.css("position", "fixed");
         html.css("left", "0");
         html.css("top", "0");
+
+        html.css("z-index", "2");
         $("body").append(html);
     };
 }
@@ -226,15 +230,30 @@ class Obstaculo{
         html.style.position = "fixed";
         html.style.width = "162px";
         html.style.height = "500px";
+
+        html.style.zIndex = 1;
         $("body").append(html);
     
         this.posicao.x = document.body.offsetWidth + 20;
-    
-        let sorteio = Math.floor(Math.random() * document.querySelector("#obstaculo-"+this.informacoes.id).offsetHeight) + document.body.offsetHeight - document.querySelector("#obstaculo-"+this.informacoes.id).offsetHeight;
-        let ySortear = Math.ceil(sorteio / 50) * 50;
-    
-        html.style.top = ySortear+"px";
+
         html.style.left = this.posicao.x+"px";
+    
+        let sorteioY = () => {
+            let sorteio = Math.ceil( ( (Math.random() * document.body.offsetHeight) + document.getElementById("player").offsetHeight + this.informacoes.espacamentos ) / 20) * 20;
+
+            if(sorteio > document.body.offsetHeight){
+                sorteio -= sorteio - (document.body.offsetHeight - ( Math.floor( ( (Math.random() * 200) + 10) ) ) );
+
+                html.style.top = sorteio+"px";
+                console.log(sorteio);
+            }
+
+            else{
+                html.style.top = sorteio+"px";
+            }
+        }
+    
+        sorteioY();
     
         html = document.createElement("img");
     
@@ -245,6 +264,8 @@ class Obstaculo{
         html.style.position = "fixed";
         html.style.width = "162px";
         html.style.height = "500px";
+
+        html.style.zIndex = 1;
         $("body").append(html);
     
         this.informacoes.id--;
@@ -282,7 +303,7 @@ class Obstaculo{
         }
         catch(erro){}
 
-        //SORTEAR OBSTACULOS
+        //sorteio OBSTACULOS
         if(framesCont >= this.informacoes.intervalo){
             this.criar();
             this.informacoes.cont += 2;
