@@ -43,7 +43,7 @@ for(let i = 0; i > 1; i++){
 *Criar variaveis para o time, por exemplo.
 *fazer uma classe jogo.
 *fazer a classe osbtaculo ser uma superclass.
-*fazer frames ser a hora, mas isso não tenho certeza.
+*um switch case onde cada class terá um valor que ordenará se é para criar/deletar aquele elemento e um loop que rodara em um intervalo maior (isso pode ser desencadeado com o local do mapa, acho que gasta menos processamento).
 
 
 * NIVEIS:
@@ -97,8 +97,8 @@ class Jogador{
         html.attr("src", "arquivos/sprite/jogador/spr_jogador.png");
         html.attr("id", "jogador");
         html.css("position", "fixed");
-        html.css("width", "160px");
-        html.css("height", "160px");
+        html.css("width", "110px");
+        html.css("height", "110px");
 
         html.css("z-index", "0");
 
@@ -113,7 +113,7 @@ class Jogador{
 
     loop(){
         this.mover();
-        return this.colisaoObstaculos();
+        return this.colisaoObstaculos() || this.colisaoChao();
     };
 
     mover(){
@@ -122,35 +122,17 @@ class Jogador{
         
         //descer
         if(framesCont > this.tempo){
-            movimentar(this, "baixo", 4);
+            movimento(this, "jogador", "baixo", 4);
         }
 
         //subir
         else if(this.colisao.cima > 0){
-            movimentar(this, "cima", 6);
+            movimento(this, "jogador", "cima", 6);
         }
 
         //resetar cooldown de descer
         else{
             this.tempo = 0;
-        }
-
-        function movimentar(objeto, direcao, velocidade){
-            switch(direcao){
-                case "baixo":
-                    for(let i = 0; i < velocidade; i++){
-                        objeto.posicao.y += 1;
-                        $("#jogador").css("top", objeto.posicao.y+"px");
-                    }
-                    break;
-
-                case "cima":
-                    for(let i = 0; i < velocidade; i++){
-                        objeto.posicao.y -= 1;
-                        $("#jogador").css("top", objeto.posicao.y+"px");
-                    }
-                    break;
-            }
         }
     };
 
@@ -158,11 +140,6 @@ class Jogador{
         //VERIFICA SE HOUVE COLISÃO DO JOGADOR COM OBSTACULO
         this.colisao.baixo = document.getElementById("jogador").offsetTop + document.getElementById("jogador").offsetHeight;
         this.colisao.cima = document.getElementById("jogador").offsetTop;
-
-        //colisao chão
-        if(this.colisao.baixo >= document.body.offsetHeight){
-            return true;
-        }
 
         //colisao obstaculo
         try{
@@ -202,6 +179,15 @@ class Jogador{
         catch(erro){}
     };
 
+    colisaoChao(){
+        //VERIFICA SE HOUVE COLISÃO DO JOGADOR COM O CHAO
+
+        //colisao chão
+        if(this.colisao.baixo >= document.body.offsetHeight){
+            return true;
+        }
+    }
+
     
 }
 class Obstaculo{
@@ -228,8 +214,9 @@ class Obstaculo{
     }
 
     criar(){
-        this.informacoes.intervalo = framesCont + 300;
+        this.informacoes.intervalo = framesCont + 250;
     
+        //obstaculo de baixo
         let html = document.createElement("img");
     
         this.informacoes.id++;
@@ -237,7 +224,7 @@ class Obstaculo{
         html.setAttribute("src", "arquivos/sprite/obstaculo/spr_obstaculo.png");
         html.setAttribute("id", "obstaculo-"+this.informacoes.id);
         html.style.position = "fixed";
-        html.style.width = "162px";
+        html.style.width = "140px";
         html.style.height = "500px";
 
         html.style.zIndex = 1;
@@ -258,6 +245,7 @@ class Obstaculo{
             html.style.top = sorteioY+"px";
         }
     
+        //obstaculo de cima
         html = document.createElement("img");
     
         this.informacoes.id++;
@@ -265,7 +253,7 @@ class Obstaculo{
         html.setAttribute("src", "arquivos/sprite/obstaculo/spr_obstaculo.png");
         html.setAttribute("id", "obstaculo-"+this.informacoes.id);
         html.style.position = "fixed";
-        html.style.width = "162px";
+        html.style.width = "140px";
         html.style.height = "500px";
 
         html.style.zIndex = 1;
@@ -309,12 +297,9 @@ class Obstaculo{
             this.informacoes.atual = this.informacoes.id - this.informacoes.cont + 1;
 
             for(let i = this.informacoes.atual; i < this.informacoes.id + 1; i++){
-                let x = document.querySelector("#obstaculo-"+i).offsetLeft;
+                this.posicao.x = document.querySelector("#obstaculo-"+i).offsetLeft;
 
-                for(let j = 0; j < 3; j++){
-                    x -= 1;
-                    document.querySelector("#obstaculo-"+i).style.left = x+"px";
-                }
+                movimento(this, "obstaculo-"+i, "esquerda", 3);
             }
         }
         catch(erro){}
@@ -346,14 +331,45 @@ class Pontuacao{
     };
 }
 
+function movimento(objeto, id, direcao, velocidade){
+    switch(direcao){
+        case "baixo":
+            for(let i = 0; i < velocidade; i++){
+                objeto.posicao.y += 1;
+                document.getElementById(id).style.top = objeto.posicao.y+"px";
+            }
+            break;
+
+        case "cima":
+            for(let i = 0; i < velocidade; i++){
+                objeto.posicao.y -= 1;
+                document.getElementById(id).style.top = objeto.posicao.y+"px";
+            }
+            break;
+
+        case "direita":
+            for(let i = 0; i < velocidade; i++){
+                objeto.posicao.x += 1;
+                document.getElementById(id).style.left = objeto.posicao.x+"px";
+            }
+            break;
+
+        case "esquerda":
+            for(let i = 0; i < velocidade; i++){
+                objeto.posicao.x -= 1;
+                document.getElementById(id).style.left = objeto.posicao.x+"px";
+            }
+            break;
+    }
+}
 
 // ==============================
 // Objetos
 // ==============================
 
 let jogador = new Jogador;
-let pontuacao = new Pontuacao;
 let obstaculo = new Obstaculo;
+let pontuacao = new Pontuacao;
 
 // ==============================
 // Jogo
@@ -373,7 +389,7 @@ function jogo(){
 // ==============================
 
 let framesCont = 0;
-let isPause = false;
+let pausado = false;
 
 function frames(){
     //teclas apertadas
@@ -387,12 +403,12 @@ function frames(){
                 break;
 
             case "pause":
-                if(isPause == false){
-                    isPause = true;
+                if(pausado == false){
+                    pausado = true;
                 }
 
                 else{
-                    isPause = false;
+                    pausado = false;
                 }
                 break;
         }
@@ -426,19 +442,13 @@ function frames(){
     }
 
     let loop = setInterval(() => {
-        if(isPause == false){
+        if(pausado == false){
             framesCont += 1;
 
             if(jogador.loop()){
                 clearInterval(loop);
             }
             obstaculo.loop();
-
-            /* 
-            if(framesCont > 100 && this.tempo == 0){
-                framesCont = 0;
-            }
-            */
         }     
     }, 10);
 }
