@@ -31,12 +31,16 @@ for(let i = 0; i > 1; i++){
 *Implementar responsividade em tempo real.
 *Posso colocar um cooldown no "pulo".
 *Ao pular os pixels do player ficam "errados" provocando o erro logico de atravesar a parte de baixo da tela.
-*a position relative por algum motivo ao adiconar um valor pela primeira vez ela o soma.
+*A position relative por algum motivo ao adiconar um valor pela primeira vez ela o soma.
 
-*herança de classes ou passar informações para o constructor.
-*trocar os if do jogador especidicando a colisao da classe objeto.
-*resetar o contador de obstaculos usando o if que determina quando um objeto passado pelo player.
-*resetar o contador de frames usando as horas ou algo do tipo.
+*Herança de classes ou passar informações para o constructor.
+*Trocar os if do jogador especidicando a colisao da classe objeto.
+*Resetar o contador de obstaculos usando o if que determina quando um objeto passado pelo player.
+*Resetar o contador de frames usando as horas ou algo do tipo.
+*Usar o metodo animate para mover os elementos.
+*Fazer compensação de pixels.
+*Deixar o codigo mais bonito/organizado. ex: criar uma função para os "for" que movimentam os elementos.
+
 
 * NIVEIS:
 
@@ -68,7 +72,6 @@ class Jogador{
 
             obstaculo: {
                 proximo: 1,
-                passou: false,
             },
         };
 
@@ -116,41 +119,36 @@ class Jogador{
 
         //colisao obstaculo
         try{
-            try{
-                if(document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetLeft + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetWidth <= this.colisao.esquerda){
-                    this.colisao.obstaculo.passou = true;
+            obstaculo.colisao.baixo = document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetHeight;
+            obstaculo.colisao.cima = document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop;
+            obstaculo.colisao.direita = document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetLeft + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetWidth;
+            obstaculo.colisao.esquerda = document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetLeft;
+
+            if(this.colisao.esquerda <= obstaculo.colisao.direita){
+                if(this.colisao.direita >= obstaculo.colisao.esquerda){
+
+                    if(this.colisao.baixo >= obstaculo.colisao.cima){
+                        return true;
+                    }
+        
+                    this.colisao.obstaculo.proximo += 1;
+
+                    obstaculo.colisao.baixo = document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetHeight;
+        
+                    if(this.colisao.cima <= obstaculo.colisao.baixo){
+                        return true;
+                    }
+    
+                    this.colisao.obstaculo.proximo -= 1;
                 }
             }
 
-            catch(erro){}
-
-            if(obstaculo.informacoes.criado == true && this.colisao.obstaculo.passou == true){
-                this.colisao.obstaculo.proximo += 2;
-
-                obstaculo.informacoes.criado = false;
-                this.colisao.obstaculo.passou = false;
-                
-            }
-    
-            if(pontuacao.pontuado == false && this.colisao.obstaculo.passou == true){
+            else{
                 pontuacao.ponto += 1;
-                document.getElementById("pontuacao").innerText = "Pontuação: " + pontuacao.ponto;
-                pontuacao.pontuado = true;
-            }
-    
-            if(this.colisao.direita >= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetLeft && this.colisao.obstaculo.passou == false){
-    
-                if(this.colisao.baixo >= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop){
-                    return true;
-                }
-    
-                this.colisao.obstaculo.proximo += 1;
-    
-                if(this.colisao.cima <= document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetHeight){
-                    return true;
-                }
 
-                this.colisao.obstaculo.proximo -= 1;
+                document.getElementById("pontuacao").innerText = "Pontuação: " + pontuacao.ponto;
+
+                this.colisao.obstaculo.proximo += 2;
             }
         }
         catch(erro){}
@@ -160,14 +158,18 @@ class Jogador{
         
         //descer
         if(framesCont > this.tempo){
-            this.posicao.y += 4;
-            $("#player").css("top", this.posicao.y+"px");
+            for(let i = 0; i < 4; i++){
+                this.posicao.y += 1;
+                $("#player").css("top", this.posicao.y+"px");
+            }
         }
 
         //subir
         else if(this.colisao.cima > 0){
-            this.posicao.y -= 6;
-            $("#player").css("top", this.posicao.y+"px"); 
+            for(let i = 0; i < 6; i++){
+                this.posicao.y -= 1;
+                $("#player").css("top", this.posicao.y+"px");
+            }
         }
 
         //resetar cooldown de descer
@@ -179,7 +181,6 @@ class Jogador{
 class Pontuacao{
     constructor(){
         this.ponto = 0;
-        this.pontuado = false;
     }
 
     criar(){
@@ -214,12 +215,11 @@ class Obstaculo{
             cont: 0,
             atual: 0,
             intervalo: 0,
-            criado: false,
         };
     }
 
     criar(){
-        this.informacoes.intervalo = framesCont + 400;
+        this.informacoes.intervalo = framesCont + 300;
     
         let html = document.createElement("img");
     
@@ -238,22 +238,16 @@ class Obstaculo{
 
         html.style.left = this.posicao.x+"px";
     
-        let sorteioY = () => {
-            let sorteio = Math.ceil( ( (Math.random() * document.body.offsetHeight) + document.getElementById("player").offsetHeight + this.informacoes.espacamentos ) / 20) * 20;
+        let sorteioY = Math.ceil( ( (Math.random() * document.body.offsetHeight) + document.getElementById("player").offsetHeight + this.informacoes.espacamentos ) / 20) * 20;
+        if(sorteioY > document.body.offsetHeight){
+            sorteioY -= sorteioY - (document.body.offsetHeight - ( Math.floor( ( (Math.random() * 200) + 10) ) ) );
 
-            if(sorteio > document.body.offsetHeight){
-                sorteio -= sorteio - (document.body.offsetHeight - ( Math.floor( ( (Math.random() * 200) + 10) ) ) );
-
-                html.style.top = sorteio+"px";
-                console.log(sorteio);
-            }
-
-            else{
-                html.style.top = sorteio+"px";
-            }
+            html.style.top = sorteioY+"px";
         }
-    
-        sorteioY();
+
+        else{
+            html.style.top = sorteioY+"px";
+        }
     
         html = document.createElement("img");
     
@@ -297,18 +291,18 @@ class Obstaculo{
             for(let i = this.informacoes.atual; i < this.informacoes.id + 1; i++){
                 let x = document.querySelector("#obstaculo-"+i).offsetLeft;
 
-                x -= 3;
-                document.querySelector("#obstaculo-"+i).style.left = x+"px";
+                for(let j = 0; j < 3; j++){
+                    x -= 1;
+                    document.querySelector("#obstaculo-"+i).style.left = x+"px";
+                }
             }
         }
         catch(erro){}
 
-        //sorteio OBSTACULOS
+        //sorteioY OBSTACULOS
         if(framesCont >= this.informacoes.intervalo){
             this.criar();
             this.informacoes.cont += 2;
-            this.informacoes.criado = true;
-            pontuacao.pontuado = false;
         }
     };
 }
