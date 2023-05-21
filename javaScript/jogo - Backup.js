@@ -30,20 +30,17 @@ for(let i = 0; i > 1; i++){
 *Tentar relacionar o evento de teclas com os frames.
 *Implementar responsividade em tempo real.
 *Posso colocar um cooldown no "pulo".
-*Ao pular os pixels do jogador ficam "errados" provocando o erro logico de atravesar a parte de baixo da tela.
+*Ao pular os pixels do player ficam "errados" provocando o erro logico de atravesar a parte de baixo da tela.
 *A position relative por algum motivo ao adiconar um valor pela primeira vez ela o soma.
 
 *Herança de classes ou passar informações para o constructor.
 *Trocar os if do jogador especidicando a colisao da classe objeto.
-*Resetar o contador de obstaculos usando o if que determina quando um objeto passado pelo jogador.
+*Resetar o contador de obstaculos usando o if que determina quando um objeto passado pelo player.
 *Resetar o contador de frames usando as horas ou algo do tipo.
 *Usar o metodo animate para mover os elementos.
 *Fazer compensação de pixels por frame.
 *Deixar o codigo mais bonito/organizado. ex: criar uma função para os "for" que movimentam os elementos.
 *Criar variaveis para o time, por exemplo.
-*fazer uma classe jogo.
-*fazer a classe osbtaculo ser uma superclass.
-*fazer frames ser a hora, mas isso não tenho certeza.
 
 
 * NIVEIS:
@@ -63,7 +60,7 @@ for(let i = 0; i > 1; i++){
 */
 
 // ==============================
-// Classes
+// CLASSES
 // ==============================
 
 class Jogador{
@@ -94,73 +91,30 @@ class Jogador{
     criar(){
         let html = $("<img></img>");
 
-        html.attr("src", "arquivos/sprite/jogador/spr_jogador.png");
-        html.attr("id", "jogador");
+        html.attr("src", "arquivos/sprite/player/spr_player.png");
+        html.attr("id", "player");
         html.css("position", "fixed");
         html.css("width", "160px");
         html.css("height", "160px");
 
         html.css("z-index", "0");
-
         $("body").append(html);
 
-        this.colisao.direita = document.getElementById("jogador").offsetLeft + document.getElementById("jogador").offsetWidth;
-        this.colisao.esquerda = document.getElementById("jogador").offsetLeft;
+        this.colisao.direita = document.getElementById("player").offsetLeft + document.getElementById("player").offsetWidth;
+        this.colisao.esquerda = document.getElementById("player").offsetLeft;
 
-        this.posicao.x = document.getElementById("jogador").offsetLeft;
-        this.posicao.y = document.getElementById("jogador").offsetTop;
+        this.posicao.x = document.getElementById("player").offsetLeft;
+        this.posicao.y = document.getElementById("player").offsetTop;
     };
 
     loop(){
-        this.mover();
-        return this.colisaoObstaculos();
-    };
-
-    mover(){
-        //MOVIMENTA O JOGADOR
-        this.colisao.cima = document.getElementById("jogador").offsetTop;
-        
-        //descer
-        if(framesCont > this.tempo){
-            movimentar(this, "baixo", 4);
-        }
-
-        //subir
-        else if(this.colisao.cima > 0){
-            movimentar(this, "cima", 6);
-        }
-
-        //resetar cooldown de descer
-        else{
-            this.tempo = 0;
-        }
-
-        function movimentar(objeto, direcao, velocidade){
-            switch(direcao){
-                case "baixo":
-                    for(let i = 0; i < velocidade; i++){
-                        objeto.posicao.y += 1;
-                        $("#jogador").css("top", objeto.posicao.y+"px");
-                    }
-                    break;
-
-                case "cima":
-                    for(let i = 0; i < velocidade; i++){
-                        objeto.posicao.y -= 1;
-                        $("#jogador").css("top", objeto.posicao.y+"px");
-                    }
-                    break;
-            }
-        }
-    };
-
-    colisaoObstaculos(){
-        //VERIFICA SE HOUVE COLISÃO DO JOGADOR COM OBSTACULO
-        this.colisao.baixo = document.getElementById("jogador").offsetTop + document.getElementById("jogador").offsetHeight;
-        this.colisao.cima = document.getElementById("jogador").offsetTop;
+        //VERIFICA SE PERDEU
+        this.colisao.baixo = document.getElementById("player").offsetTop + document.getElementById("player").offsetHeight;
+        this.colisao.cima = document.getElementById("player").offsetTop;
 
         //colisao chão
         if(this.colisao.baixo >= document.body.offsetHeight){
+            
             return true;
         }
 
@@ -172,19 +126,17 @@ class Jogador{
             obstaculo.colisao.esquerda = document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetLeft;
 
             if(this.colisao.esquerda <= obstaculo.colisao.direita){
-
                 if(this.colisao.direita >= obstaculo.colisao.esquerda){
 
                     if(this.colisao.baixo >= obstaculo.colisao.cima){
                         return true;
                     }
- 
+        
                     this.colisao.obstaculo.proximo += 1;
 
                     obstaculo.colisao.baixo = document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetTop + document.getElementById("obstaculo-"+this.colisao.obstaculo.proximo).offsetHeight;
-
+        
                     if(this.colisao.cima <= obstaculo.colisao.baixo){
-
                         return true;
                     }
     
@@ -194,15 +146,55 @@ class Jogador{
 
             else{
                 pontuacao.ponto += 1;
+
                 document.getElementById("pontuacao").innerText = "Pontuação: " + pontuacao.ponto;
 
                 this.colisao.obstaculo.proximo += 2;
             }
         }
         catch(erro){}
-    };
 
-    
+        //MOVIMENTAÇÃO
+        this.colisao.cima = document.getElementById("player").offsetTop;
+        
+        //descer
+        if(framesCont > this.tempo){
+            for(let i = 0; i < 4; i++){
+                this.posicao.y += 1;
+                $("#player").css("top", this.posicao.y+"px");
+            }
+        }
+
+        //subir
+        else if(this.colisao.cima > 0){
+            for(let i = 0; i < 6; i++){
+                this.posicao.y -= 1;
+                $("#player").css("top", this.posicao.y+"px");
+            }
+        }
+
+        //resetar cooldown de descer
+        else{
+            this.tempo = 0;
+        }
+    };
+}
+class Pontuacao{
+    constructor(){
+        this.ponto = 0;
+    }
+
+    criar(){
+        let html = $("<h1>Pontuação:</h1>")
+
+        html.attr("id", "pontuacao");
+        html.css("position", "fixed");
+        html.css("left", "0");
+        html.css("top", "0");
+
+        html.css("z-index", "2");
+        $("body").append(html);
+    };
 }
 class Obstaculo{
     constructor(){
@@ -247,7 +239,7 @@ class Obstaculo{
 
         html.style.left = this.posicao.x+"px";
     
-        let sorteioY = Math.ceil( ( (Math.random() * document.body.offsetHeight) + document.getElementById("jogador").offsetHeight + this.informacoes.espacamentos ) / 20) * 20;
+        let sorteioY = Math.ceil( ( (Math.random() * document.body.offsetHeight) + document.getElementById("player").offsetHeight + this.informacoes.espacamentos ) / 20) * 20;
         if(sorteioY > document.body.offsetHeight){
             sorteioY -= sorteioY - (document.body.offsetHeight - ( Math.floor( ( (Math.random() * 200) + 10) ) ) );
 
@@ -273,7 +265,7 @@ class Obstaculo{
     
         this.informacoes.id--;
         
-        this.posicao.y = document.querySelector("#obstaculo-"+this.informacoes.id).offsetTop - document.querySelector("#obstaculo-"+this.informacoes.id).offsetHeight - document.getElementById("jogador").offsetHeight - this.informacoes.espacamentos;
+        this.posicao.y = document.querySelector("#obstaculo-"+this.informacoes.id).offsetTop - document.querySelector("#obstaculo-"+this.informacoes.id).offsetHeight - document.getElementById("player").offsetHeight - this.informacoes.espacamentos;
         html.style.top = this.posicao.y+"px";
         html.style.left = this.posicao.x+"px";
     
@@ -281,14 +273,8 @@ class Obstaculo{
     };
 
     loop(){
-        this.remover();
-        this.mover();
-        this.desenhar();
-    };
-
-    remover(){
         try{
-            //VERIFICA SE HÁ OBSTACULOS PARA REMOVER
+            //REMOVER OBSTACULOS
             this.informacoes.atual = this.informacoes.id - this.informacoes.cont + 1;
             
             if(document.querySelector("#obstaculo-"+this.informacoes.atual).offsetLeft < 0 - document.querySelector("#obstaculo-"+this.informacoes.atual).offsetWidth){
@@ -299,13 +285,8 @@ class Obstaculo{
                 this.informacoes.cont -= 2;
 
             }
-        }
-        catch(erro){}
-    }
 
-    mover(){
-        try{
-            //MOVE OS OBSTACULOS PARA A ESQUERDA
+            //MOVER PARA ESQUERDA
             this.informacoes.atual = this.informacoes.id - this.informacoes.cont + 1;
 
             for(let i = this.informacoes.atual; i < this.informacoes.id + 1; i++){
@@ -318,37 +299,17 @@ class Obstaculo{
             }
         }
         catch(erro){}
-    }
 
-    desenhar(){
-        //DESENHAR OBSTACULOS DE ACORDO COM INTERVALO DE TEMPO DETERMINADO
+        //sorteioY OBSTACULOS
         if(framesCont >= this.informacoes.intervalo){
             this.criar();
             this.informacoes.cont += 2;
         }
-    }
-}
-class Pontuacao{
-    constructor(){
-        this.ponto = 0;
-    }
-
-    criar(){
-        let html = $("<h1>Pontuação:</h1>")
-
-        html.attr("id", "pontuacao");
-        html.css("position", "fixed");
-        html.css("left", "0");
-        html.css("top", "0");
-
-        html.css("z-index", "2");
-        $("body").append(html);
     };
 }
 
-
 // ==============================
-// Objetos
+// OBJETOS
 // ==============================
 
 let jogador = new Jogador;
@@ -356,7 +317,7 @@ let pontuacao = new Pontuacao;
 let obstaculo = new Obstaculo;
 
 // ==============================
-// Jogo
+// JOGO
 // ==============================
 
 function jogo(){
@@ -369,76 +330,39 @@ function jogo(){
 }
 
 // ==============================
-// Loop
+// LOOP
 // ==============================
 
 let framesCont = 0;
-let isPause = false;
 
 function frames(){
-    //teclas apertadas
-    $("body").keydown((e) => {
-        switch(tecla(e)){
-            case "subir":
-                if(jogador.tecla.press == false){
-                    jogador.tempo = framesCont + 25;
-                    jogador.tecla.press = true;
-                }
-                break;
+    $("body").keydown((event) => { 
+        if(event.key == "w" && jogador.tecla.press == false){
+            jogador.tempo = framesCont + 25;
+            jogador.tecla.press = true;
 
-            case "pause":
-                if(isPause == false){
-                    isPause = true;
-                }
-
-                else{
-                    isPause = false;
-                }
-                break;
-        }
-    });
-
-
-    //teclas soltas
-    $("body").keyup((e) => {
-        switch(tecla(e)){
-            case "subir":
+            $("body").keyup(() => {
                 jogador.tecla.press = false;
-                break;
-        } 
+            });
+        }
+
+        if(event.key == "Enter"){
+            clearInterval(loop);
+        }
     });
-
-    function tecla(e){
-        let subir = ["KeyW", "ArrowUp", "Space",];
-        let pause = ["Enter", "KeyP"];
-            
-        for(let i = 0; i < subir.length; i++){
-            if(subir[i] == e.code){
-                return "subir";
-            }
-        }
-
-        for(let i = 0; i < pause.length; i++){
-            if(pause[i] == e.code){
-                return "pause";
-            }
-        }
-    }
 
     let loop = setInterval(() => {
-        if(isPause == false){
-            framesCont += 1;
+        framesCont += 1;
 
-            if(jogador.loop()){
-                clearInterval(loop);
-            }
-            obstaculo.loop();
+        if(jogador.loop()){
+            clearInterval(loop);
+        }
+        obstaculo.loop();
 
-            /* 
-            if(framesCont > 100 && this.tempo == 0){
-                framesCont = 0;
-            }
-            */
-        }     
+        /* 
+        if(framesCont > 100 && this.tempo == 0){
+            framesCont = 0;
+        }
+        */     
     }, 10);
 }
