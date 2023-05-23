@@ -1,7 +1,7 @@
 $(document).ready(() => {
     $("#btn_comecar").click(() => {
         $("#btn_secao").remove();    
-        jogo();
+        jogo.desenhar();
     });
 
     $("#btn_opcoes").click(() => {
