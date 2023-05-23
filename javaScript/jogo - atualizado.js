@@ -122,12 +122,12 @@ class Jogador{
         
         //descer
         if(jogo.framesCont > this.tempo){
-            movimento(this, "jogador", "baixo", 4);
+            jogo.movimento(this, "jogador", "baixo", 4);
         }
 
         //subir
         else if(this.colisao.cima > 0){
-            movimento(this, "jogador", "cima", 6);
+            jogo.movimento(this, "jogador", "cima", 6);
         }
 
         //resetar cooldown de descer
@@ -299,7 +299,7 @@ class Obstaculo{
             for(let i = this.informacoes.atual; i < this.informacoes.id + 1; i++){
                 this.posicao.x = document.querySelector("#obstaculo-"+i).offsetLeft;
 
-                movimento(this, "obstaculo-"+i, "esquerda", 3);
+                jogo.movimento(this, "obstaculo-"+i, "esquerda", 3);
             }
         }
         catch(erro){}
@@ -331,38 +331,6 @@ class Pontuacao{
     };
 }
 
-function movimento(objeto, id, direcao, velocidade){
-    switch(direcao){
-        case "baixo":
-            for(let i = 0; i < velocidade; i++){
-                objeto.posicao.y += 1;
-                document.getElementById(id).style.top = objeto.posicao.y+"px";
-            }
-            break;
-
-        case "cima":
-            for(let i = 0; i < velocidade; i++){
-                objeto.posicao.y -= 1;
-                document.getElementById(id).style.top = objeto.posicao.y+"px";
-            }
-            break;
-
-        case "direita":
-            for(let i = 0; i < velocidade; i++){
-                objeto.posicao.x += 1;
-                document.getElementById(id).style.left = objeto.posicao.x+"px";
-            }
-            break;
-
-        case "esquerda":
-            for(let i = 0; i < velocidade; i++){
-                objeto.posicao.x -= 1;
-                document.getElementById(id).style.left = objeto.posicao.x+"px";
-            }
-            break;
-    }
-}
-
 // ==============================
 // Objetos
 // ==============================
@@ -372,31 +340,24 @@ let obstaculo = new Obstaculo;
 let pontuacao = new Pontuacao;
 
 // ==============================
-// JOGO
+// Teclado
 // ==============================
 
-class Jogo{
+class Teclado{
     constructor(){
-        this.framesCont = 0;
-        this.pausado = false;
+        this.listaTeclas = {
+            subir: ["KeyW", "ArrowUp", "Space",],
+            pause: ["Enter", "KeyP"],
+        }
     }
 
-    desenhar(){
-        jogador.criar();
-        pontuacao.criar();
-        obstaculo.criar();
-        obstaculo.informacoes.cont += 2;
-
-        this.frames();
-    }
-
-    frames(){
+    teclaApertada(){
         //teclas apertadas
         $("body").keydown((e) => {
-            switch(tecla(e)){
+            switch(this.tecla(e)){
                 case "subir":
                     if(jogador.tecla.press == false){
-                        jogador.tempo = this.framesCont + 25;
+                        jogador.tempo = jogo.framesCont + 25;
                         jogador.tecla.press = true;
                     }
                     break;
@@ -416,41 +377,97 @@ class Jogo{
 
         //teclas soltas
         $("body").keyup((e) => {
-            switch(tecla(e)){
+            switch(this.tecla(e)){
                 case "subir":
                     jogador.tecla.press = false;
                     break;
             } 
         });
+    }
 
-        function tecla(e){
-            let subir = ["KeyW", "ArrowUp", "Space",];
-            let pause = ["Enter", "KeyP"];
-                
-            for(let i = 0; i < subir.length; i++){
-                if(subir[i] == e.code){
-                    return "subir";
-                }
-            }
-
-            for(let i = 0; i < pause.length; i++){
-                if(pause[i] == e.code){
-                    return "pause";
-                }
+    tecla(e){           
+        for(let i = 0; i < this.listaTeclas.subir.length; i++){
+            if(this.listaTeclas.subir[i] == e.code){
+                return "subir";
             }
         }
 
-        let loop = setInterval(() => {
+        for(let i = 0; i < this.listaTeclas.pause.length; i++){
+            if(this.listaTeclas.pause[i] == e.code){
+                return "pause";
+            }
+        }
+    }
+}
+
+let teclado = new Teclado;
+
+// ==============================
+// JOGO
+// ==============================
+
+class Jogo{
+    constructor(){
+        this.framesCont = 0;
+        this.loop = 0,
+        this.pausado = false;
+    }
+
+    desenhar(){
+        jogador.criar();
+        pontuacao.criar();
+        obstaculo.criar();
+        obstaculo.informacoes.cont += 2;
+
+        this.frames();
+    }
+
+    frames(){
+        teclado.teclaApertada();
+
+        this.loop = setInterval(() => {
             if(this.pausado == false){
                 this.framesCont += 1;
 
                 if(jogador.loop()){
-                    clearInterval(loop);
+                    clearInterval(this.loop);
                     this.perdeu();
                 }
                 obstaculo.loop();
             }     
         }, 10);
+    }
+
+    movimento(objeto, id, direcao, velocidade){
+        switch(direcao){
+            case "baixo":
+                for(let i = 0; i < velocidade; i++){
+                    objeto.posicao.y += 1;
+                    document.getElementById(id).style.top = objeto.posicao.y+"px";
+                }
+                break;
+    
+            case "cima":
+                for(let i = 0; i < velocidade; i++){
+                    objeto.posicao.y -= 1;
+                    document.getElementById(id).style.top = objeto.posicao.y+"px";
+                }
+                break;
+    
+            case "direita":
+                for(let i = 0; i < velocidade; i++){
+                    objeto.posicao.x += 1;
+                    document.getElementById(id).style.left = objeto.posicao.x+"px";
+                }
+                break;
+    
+            case "esquerda":
+                for(let i = 0; i < velocidade; i++){
+                    objeto.posicao.x -= 1;
+                    document.getElementById(id).style.left = objeto.posicao.x+"px";
+                }
+                break;
+        }
     }
 
     perdeu(){
