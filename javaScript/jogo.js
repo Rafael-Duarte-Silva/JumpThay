@@ -210,6 +210,7 @@ class Obstaculo{
             cont: 0,
             atual: 0,
             intervalo: 0,
+            remover: 0,
         };
     }
 
@@ -280,8 +281,9 @@ class Obstaculo{
             this.informacoes.atual = this.informacoes.id - this.informacoes.cont + 1;
             
             if(document.querySelector("#obstaculo-"+this.informacoes.atual).offsetLeft < 0 - document.querySelector("#obstaculo-"+this.informacoes.atual).offsetWidth){
+                this.informacoes.remover = this.informacoes.id - this.informacoes.cont + 3;
 
-                for(let i = this.informacoes.atual; i < this.informacoes.id - this.informacoes.cont + 3; i++){
+                for(let i = this.informacoes.atual; i < this.informacoes.remover; i++){
                     $("#obstaculo-"+i).remove();
                 }
                 this.informacoes.cont -= 2;
@@ -330,24 +332,16 @@ class Pontuacao{
         $("body").append(html);
     };
 }
-
-// ==============================
-// Objetos
-// ==============================
-
-let jogador = new Jogador;
-let obstaculo = new Obstaculo;
-let pontuacao = new Pontuacao;
-
-// ==============================
-// Teclado
-// ==============================
-
 class Teclado{
     constructor(){
         this.listaTeclas = {
             subir: ["KeyW", "ArrowUp", "Space",],
             pause: ["Enter", "KeyP"],
+        }
+
+        this.comprimento = {
+            subir: this.listaTeclas.subir.length,
+            pause: this.listaTeclas.pause.length,
         }
     }
 
@@ -363,12 +357,12 @@ class Teclado{
                     break;
 
                 case "pause":
-                    if(this.pausado == false){
-                        this.pausado = true;
+                    if(jogo.pausado == false){
+                        jogo.pausado = true;
                     }
 
                     else{
-                        this.pausado = false;
+                        jogo.pausado = false;
                     }
                     break;
             }
@@ -386,13 +380,13 @@ class Teclado{
     }
 
     tecla(e){           
-        for(let i = 0; i < this.listaTeclas.subir.length; i++){
+        for(let i = 0; i < this.comprimento.subir; i++){
             if(this.listaTeclas.subir[i] == e.code){
                 return "subir";
             }
         }
 
-        for(let i = 0; i < this.listaTeclas.pause.length; i++){
+        for(let i = 0; i < this.comprimento.pause; i++){
             if(this.listaTeclas.pause[i] == e.code){
                 return "pause";
             }
@@ -400,11 +394,7 @@ class Teclado{
     }
 }
 
-let teclado = new Teclado;
-
-// ==============================
-// JOGO
-// ==============================
+//JOGO
 
 class Jogo{
     constructor(){
@@ -475,4 +465,12 @@ class Jogo{
     }
 }
 
+// ==============================
+// Objetos
+// ==============================
+
+let jogador = new Jogador;
+let obstaculo = new Obstaculo;
+let pontuacao = new Pontuacao;
+let teclado = new Teclado;
 let jogo = new Jogo;
