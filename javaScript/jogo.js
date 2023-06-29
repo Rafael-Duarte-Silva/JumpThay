@@ -89,16 +89,18 @@ class Jogador{
         };
 
         this.tempo = 0;
+
+        this.contadorAnimacao = 0;
     }
 
     criar(){
         let html = $("<img></img>");
 
-        html.attr("src", "arquivos/sprite/jogador/spr_jogador.png");
+        html.attr("src", "arquivos/sprite/jogador/spr_jogador1.svg");
         html.attr("id", "jogador");
         html.css("position", "fixed");
-        html.css("width", "110px");
-        html.css("height", "110px");
+        html.css("width", "70px");
+        html.css("height", "70px");
 
         html.css("z-index", "0");
 
@@ -112,8 +114,19 @@ class Jogador{
     }
 
     loop(){
+        this.animacao();
         this.mover();
         return this.colisaoObstaculos() || this.colisaoChao();
+    }
+
+    animacao(){
+        if(this.contadorAnimacao >= 4){
+            this.contadorAnimacao = 0;
+        }
+
+        this.contadorAnimacao++;
+
+        document.getElementById("jogador").setAttribute("src", "arquivos/sprite/jogador/spr_jogador" + this.contadorAnimacao + ".svg")
     }
 
     mover(){
@@ -256,6 +269,7 @@ class Obstaculo{
         html.style.position = "fixed";
         html.style.width = "140px";
         html.style.height = "500px";
+        html.style.transform = "rotate(180deg)";
 
         html.style.zIndex = 1;
         $("body").append(html);
@@ -327,6 +341,7 @@ class Pontuacao{
         html.css("position", "fixed");
         html.css("left", "0");
         html.css("top", "0");
+        html.css("color", "white");
 
         html.css("z-index", "2");
         $("body").append(html);
